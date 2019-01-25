@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>人民币大小写转换</title>
+    <style>
+      * {
+        padding: 0;
+        margin: 0;
+      }
+      body {
+        background: #abcdef;
+      }
+      .wrap {
+        width: 1000px;
+        height: 300px;
+        margin: 100px auto;
+        text-align: center;
+      }
+      input {
+        width: 300px;
+        height: 10px;
+        padding: 15px;
+        font-size: 20px;
+      }
+      button {
+        width: 100px;
+        height: 44px;
+        text-align: center;
+        line-height: 44px;
+        cursor: pointer;
+      }
+      #result {
+        margin-top: 50px;
+        font-size: 30px;
+        color: black;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <input type="text" placeholder="请输入要转换的数字" />
+      <button>转换</button>
+      <div id="result"></div>
+    </div>
+    <script>
+      var changeMO = {
+        init: function() {
+          this.input = document.getElementsByTagName("input")[0];
+          this.btn = document.getElementsByTagName("button")[0];
+          this.resultDom = document.getElementById("result");
+          this.list = ['零','壹','贰','叁','肆','伍','陆','柒','捌','玖','拾']
+          this.bindEvent();
+        },
+        unitSwitch:function(value){
+          switch (value) {
+            case -1: return '分';
+            case 0: return '角';
+            case 1: return '元';
+            case 2: return '拾';
+            case 3: return '佰';
+            case 4: return '仟';
+            case 5: return '万';
+            case 6: return '拾万';
+            case 7: return '佰万';
+            case 8: return '仟万';
+            case 9: return '亿';
+            case 10: return '拾亿';
+            case 11: return '佰亿';
+            case 12: return '仟亿';
+          }
+        },
+        main: function() {
+            this.resultText = '';
+            this.unitCount = 0;
+            this.result = [];
+            this.resultDom.innerText = null;
+            this.value = this.input.value;
+            if(this.value > 999999999999){
+              alert('数值太大，请重新输入');
+              return 0;
+            }else if(this.value <= 0){
+              alert('数值太小，请重新输入');
+              return 0;
+            }
+            this.integer = parseInt(this.value);
+            if(this.value - this.integer !== 0 && this.value*100 - this.integer*100 >= 1){
+              this.value = parseInt((this.value * 1000)/10);
+              this.unitCount = -2;
+            }else{
+              this.value = parseInt(this.value);
+              this.result.push('整');
+            }
+            while(this.value > 0){
+                this.unitCount ++ ;
+                if(this.unitSwitch(this.unitCount)){
+                  this.result.push(this.unitSwitch(this.unitCount))
+                }
+                this.result.push(this.list[this.value % 10]);
+                this.value = parseInt(this.value / 10);
+                
+            }
+            this.resultText = this.result.reverse().join('');
+            this.resultText = this.resultText.replace(/(零[角拾佰仟万拾万佰万仟万亿拾亿佰亿仟亿]*(?=零))+/g,'');
+            this.resultText = this.resultText.replace(/零元/g,'元');
+            this.resultText = this.resultText.replace(/零分$/g,'');
+            this.resultText = this.resultText.replace(/零[\s\S]/g,'零');
+            this.resultText = this.resultText.replace(/[亿](?=[\s\S]+[亿])/g,'');
+            this.resultText = this.resultText.replace(/[万](?=[\s\S]+[万])/g,'');
+            this.resultDom.innerText = this.resultText;
+            
+        },
+        bindEvent:function(){
+            this.btn.onclick = this.main.bind(this);
+            document.getElementsByTagName('body')[0].onkeydown = (e)=>{
+                if(e.key == 'Enter'|| e.keyCode == 13){
+                    this.main.bind(this)()
+                }
+            }
+        }
+      };
+      changeMO.init();
+    </script>
+  </body>
+</html>
